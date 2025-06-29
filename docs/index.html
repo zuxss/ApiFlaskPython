@@ -1,18 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sistema de Tareas</title>
+  <meta charset="UTF-8" />
+  <title>Cliente Web - Sistema de Tareas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: auto;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 5px;
+      width: 100%;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Bienvenido al Sistema de Tareas</h1>
-  <p>Este es un proyecto realizado con Flask y SQLite.</p>
-  <p>El servidor provee una API REST con los siguientes endpoints:</p>
-  <ul>
-    <li><strong>POST /registro</strong> - Registro de usuarios</li>
-    <li><strong>POST /login</strong> - Inicio de sesión</li>
-    <li><strong>GET /tareas</strong> - Página de bienvenida (HTML)</li>
-  </ul>
- 
+  <h1>Cliente Web - API Sistema de Tareas</h1>
+
+  <h2>Registro</h2>
+  <input type="text" id="reg_usuario" placeholder="Usuario">
+  <input type="password" id="reg_contraseña" placeholder="Contraseña">
+  <button onclick="registrarse()">Registrarse</button>
+
+  <h2>Login</h2>
+  <input type="text" id="log_usuario" placeholder="Usuario">
+  <input type="password" id="log_contraseña" placeholder="Contraseña">
+  <button onclick="login()">Iniciar Sesión</button>
+
+  <h2>Ver página de tareas</h2>
+  <button onclick="verTareas()">GET /tareas</button>
+
+  <h2>Respuesta del servidor</h2>
+  <textarea id="respuesta" readonly></textarea>
+
+  <script>
+    const baseURL = "http://127.0.0.1:5000";
+
+    function registrarse() {
+      const usuario = document.getElementById("reg_usuario").value;
+      const contraseña = document.getElementById("reg_contraseña").value;
+      fetch(`${baseURL}/registro`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, contraseña })
+      })
+      .then(res => res.json())
+      .then(data => mostrar(data))
+      .catch(err => mostrar({ error: err.message }));
+    }
+
+    function login() {
+      const usuario = document.getElementById("log_usuario").value;
+      const contraseña = document.getElementById("log_contraseña").value;
+      fetch(`${baseURL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario, contraseña })
+      })
+      .then(res => res.json())
+      .then(data => mostrar(data))
+      .catch(err => mostrar({ error: err.message }));
+    }
+
+    function verTareas() {
+      fetch(`${baseURL}/tareas`)
+        .then(res => res.text())
+        .then(html => mostrar(html))
+        .catch(err => mostrar({ error: err.message }));
+    }
+
+    function mostrar(mensaje) {
+      const respuesta = typeof mensaje === "string"
+        ? mensaje
+        : JSON.stringify(mensaje, null, 2);
+      document.getElementById("respuesta").value = respuesta;
+    }
+  </script>
 </body>
 </html>
